@@ -12,6 +12,8 @@ import UIKit
 
 class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
+    
+    
     private var newsItem: [News]?
     
     var selectedRow: Int?
@@ -24,10 +26,22 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         self.view.backgroundColor = .lightGray
-        
+        checkRegion()
         setNavigation()
         setSectionView()
         setTableView()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didClickSectionToReloadTableView(_:)), name: .didClickSection, object: nil)
+    }
+    
+    func checkRegion() {
+
+    }
+    
+
+    
+    @objc func didClickSectionToReloadTableView(_ notification: Notification) {
+        print("reloadTableView")
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -113,3 +127,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
 }
 
 
+extension Notification.Name {
+    static let didClickSection = Notification.Name("didClickSection")
+
+}

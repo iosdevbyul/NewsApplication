@@ -61,6 +61,8 @@ class SectionView: UIView, UICollectionViewDelegateFlowLayout{
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("\(indexPath.item) selected")
+        NotificationCenter.default.post(name: .didClickSection, object: nil, userInfo: ["1":indexPath.item])
+//        NotificationCenter.default.post(name: .didReceiveData, object: nil)
     }
     
     // MARK: UICollectionViewDelegateFlowLayout
