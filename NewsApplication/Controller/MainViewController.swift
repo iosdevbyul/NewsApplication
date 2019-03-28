@@ -7,13 +7,10 @@
 //
 
 import UIKit
-
-import UIKit
+import SwiftyPlistManager
 
 class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    
-    
+
     private var newsItem: [News]?
     
     var selectedRow: Int?
@@ -21,6 +18,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     let tableView: UITableView = UITableView()
     let sectionHeight: CGFloat = 50
     
+    let sectionManager = SectionManager()
+    
+    var selectedNewsSection: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,23 +35,37 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func checkRegion() {
+        SwiftyPlistManager.shared.start(plistNames: ["News"], logging: true)
+        SwiftyPlistManager.shared.getValue(for: "Region", fromPlistWithName: "News") { (result, error) in
+            if error == nil {
+                guard let result = result else {
+                    return
+                }
+                print("\(result)")
+            }
+        }
 
     }
     
-
-    
     @objc func didClickSectionToReloadTableView(_ notification: Notification) {
-        print("reloadTableView")
+        if let value = notification.userInfo?["selectedRegionSection"] {
+            loadNews(value as! Int)
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        loadTopNews()
+        loadNews(selectedNewsSection)
     }
     
-    private func loadTopNews() {
+    private func loadNews(_ sectionNumber: Int) {
+        selectedNewsSection = sectionNumber
         
         let feedParser = FeedParser()
-        feedParser.parseFeed(url: "https://rss.cbc.ca/lineup/topstories.xml") { (newsItem) in
+        if sectionNumber == 1 {
+            return
+        }
+        let url = sectionManager.getURL(sectionNumber: sectionNumber, sectionType: 0)
+        feedParser.parseFeed(url: url) { (newsItem) in
             self.newsItem = newsItem
             OperationQueue.main.addOperation {
                 self.tableView.reloadData()

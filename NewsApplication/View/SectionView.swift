@@ -10,7 +10,7 @@ import UIKit
 
 class SectionView: UIView, UICollectionViewDelegateFlowLayout{
     
-    let sec = Section()
+    let sec = SectionManager()
     
     let collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: 0, height: 0), collectionViewLayout: UICollectionViewFlowLayout())
     
@@ -61,7 +61,7 @@ class SectionView: UIView, UICollectionViewDelegateFlowLayout{
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("\(indexPath.item) selected")
-        NotificationCenter.default.post(name: .didClickSection, object: nil, userInfo: ["1":indexPath.item])
+        NotificationCenter.default.post(name: .didClickSection, object: nil, userInfo: ["selectedRegionSection":indexPath.item])
 //        NotificationCenter.default.post(name: .didReceiveData, object: nil)
     }
     
@@ -121,12 +121,9 @@ class SectionCollectionViewCell: UICollectionViewCell {
         
         sectionNameLabel.frame = CGRect(x: 0, y: 0, width: self.frame.size.width, height: self.frame.size.height)
         
-        
-        
         sectionNameLabel.textAlignment = .center
         sectionNameLabel.textColor = .white
         self.addSubview(sectionNameLabel)
-        
     }
 }
 
@@ -135,16 +132,16 @@ extension UIView: UICollectionViewDataSource, UICollectionViewDelegate {
     
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let sec = Section()
-        return sec.getSectionCount()
+        let sectionManager = SectionManager()
+        return sectionManager.getNewsSectionCount()
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "sectionCollectionViewCell", for: indexPath) as? SectionCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let sec = Section().getSection()
-        cell.sectionNameLabel.text = sec[indexPath.item]
+        let sectionManager = SectionManager()
+        cell.sectionNameLabel.text = sectionManager.getNewsSection()[indexPath.item]
         return cell
         
     }

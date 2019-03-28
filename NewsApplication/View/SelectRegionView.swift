@@ -8,30 +8,9 @@
 
 import UIKit
 
-class SelectRegion: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
+class SelectRegionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
     
-    let pickerData: [String] = [
-    "British Columbia",
-    "Kamloops",
-    "Calgary",
-    "Edmonton",
-    "Saskatchewan",
-    "Saskatoon",
-    "Manitoba",
-    "Thunder Bay",
-    "Sudbury",
-    "Windsor",
-    "London",
-    "Kitchener-Waterloo",
-    "Toronto",
-    "Hamilton",
-    "Montreal",
-    "New Brunswick",
-    "Prince Edward Island",
-    "Nova Scotia",
-    "Newfoundland & Labrador",
-    "North"
-    ]
+    let sectionManager: SectionManager = SectionManager()
     
     let picker: UIPickerView = UIPickerView()
 
@@ -77,11 +56,11 @@ class SelectRegion: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return pickerData.count
+        return sectionManager.getRegionCount()
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return pickerData[row]
+        return sectionManager.getRegion()[row]
     }
     
     
