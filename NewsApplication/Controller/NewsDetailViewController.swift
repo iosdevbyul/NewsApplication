@@ -20,6 +20,8 @@ class NewsDetailViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         
+        self.view.backgroundColor = .lightGray
+        
         setWebView()
         
         loadNews()
@@ -27,6 +29,7 @@ class NewsDetailViewController: UIViewController {
     
     func setWebView() {
         webView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        self.view.addSubview(webView)
         
     }
     

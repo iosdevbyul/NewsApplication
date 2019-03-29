@@ -16,10 +16,12 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     var selectedRow: Int?
     
     let tableView: UITableView = UITableView()
+    private let refreshControl = UIRefreshControl()
+    let activityIndicatorView = UIActivityIndicatorView()
+
     let sectionHeight: CGFloat = 50
     
     let sectionManager = SectionManager()
-    
     var selectedNewsSection: Int = 0
     
     override func viewDidLoad() {
@@ -58,19 +60,19 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func loadNews(_ sectionNumber: Int) {
-//        selectedNewsSection = sectionNumber
-//        
-//        let feedParser = FeedParser()
-//        if sectionNumber == 1 {
-//            return
-//        }
-//        let url = sectionManager.getURL(sectionNumber: sectionNumber, sectionType: 0)
-//        feedParser.parseFeed(url: url) { (newsItem) in
-//            self.newsItem = newsItem
-//            OperationQueue.main.addOperation {
-//                self.tableView.reloadData()
-//            }
-//        }
+        selectedNewsSection = sectionNumber
+        
+        let feedParser = FeedParser()
+        if sectionNumber == 1 {
+            return
+        }
+        let url = sectionManager.getURL(sectionNumber: sectionNumber, sectionType: 0)
+        feedParser.parseFeed(url: url) { (newsItem) in
+            self.newsItem = newsItem
+            OperationQueue.main.addOperation {
+                self.tableView.reloadData()
+            }
+        }
     }
     
     func setNavigation() {
@@ -109,6 +111,34 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         tableView.delegate = self
         tableView.dataSource = self
+        
+        
+        
+        setRefreshControl()
+
+    }
+    
+    func setRefreshControl() {
+        if #available(iOS 10.0, *) {
+            tableView.refreshControl = self.refreshControl
+        } else {
+            tableView.addSubview(self.refreshControl)
+        }
+        self.refreshControl.addTarget(self, action: #selector(refreshTableView(_:)), for: .valueChanged)
+        
+        self.refreshControl.tintColor = .red
+        
+
+//        let myAttribute = [NSAttributedString.Key.foregroundColor: UIColor.red]
+//        let myAttrString = NSAttributedString(string: "Reloading News Data ...", attributes: myAttribute)
+//        self.refreshControl.attributedTitle = myAttrString
+    }
+    
+    @objc func refreshTableView(_ sender: Any) {
+        self.loadNews(self.selectedNewsSection)
+        self.refreshControl.endRefreshing()
+        self.activityIndicatorView.stopAnimating()
+        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -131,12 +161,23 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         selectedRow = indexPath.row
-        //        print(selectedRow)
-        //        performSegue(withIdentifier: newsDetailSegueIdentifier, sender: self)
+        
+        guard let item = newsItem?[indexPath.item] else {
+            return
+        }
+        
+        let destination = NewsDetailViewController()
+        destination.urlString = item.link
+        navigationController?.pushViewController(destination, animated: true)
+
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        //
     }
 }
 
