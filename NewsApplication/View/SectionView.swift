@@ -7,10 +7,10 @@
 //
 
 import UIKit
+let sectionManager = SectionManager()
 
 class SectionView: UIView, UICollectionViewDelegateFlowLayout{
     
-    let sec = SectionManager()
     
     let collectionView = UICollectionView(frame: CGRect(x: 0, y: 0, width: 0, height: 0), collectionViewLayout: UICollectionViewFlowLayout())
     
@@ -129,10 +129,9 @@ class SectionCollectionViewCell: UICollectionViewCell {
 
 
 extension UIView: UICollectionViewDataSource, UICollectionViewDelegate {
-    
+
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let sectionManager = SectionManager()
         return sectionManager.getNewsSectionCount()
     }
     
@@ -140,7 +139,6 @@ extension UIView: UICollectionViewDataSource, UICollectionViewDelegate {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "sectionCollectionViewCell", for: indexPath) as? SectionCollectionViewCell else {
             return UICollectionViewCell()
         }
-        let sectionManager = SectionManager()
         cell.sectionNameLabel.text = sectionManager.getNewsSection()[indexPath.item]
         return cell
         

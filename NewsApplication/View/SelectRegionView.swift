@@ -30,21 +30,20 @@ class SelectRegionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func settingPicker() {
-        picker.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 200)
-        picker.center = self.center
-        self.addSubview(picker)
+        self.picker.frame = CGRect(x: 20, y: 20, width: self.frame.size.width - 40, height: self.frame.size.height - 80)
+        self.addSubview(self.picker)
+        self.picker.delegate = self
+        self.picker.dataSource = self
         
-        picker.delegate = self
-        picker.dataSource = self
-        
-        picker.selectedRow(inComponent: 0)
+        self.picker.selectedRow(inComponent: 0)
     }
     
     func settingButton() {
-        let button: UIButton = UIButton(frame: CGRect(x: (self.frame.size.width)/2 - 50, y: picker.frame.origin.y + picker.frame.size.height + 30, width: 100, height: 40))
-        button.titleLabel?.text = "Select"
-        button.addTarget(self, action: #selector(clickSelectRegion), for: .touchUpInside)
-        self.addSubview(button)
+        let confirmButton: UIButton = UIButton(frame: CGRect(x: 20, y: picker.frame.origin.y + picker.frame.size.height + 10, width: self.frame.size.width - 40, height: 20))
+        confirmButton.setTitle("Select", for: .normal)
+        confirmButton.addTarget(self, action: #selector(clickSelectRegion), for: .touchUpInside)
+        confirmButton.backgroundColor = .red
+        self.addSubview(confirmButton)
     }
     
     @objc func clickSelectRegion() {

@@ -58,19 +58,19 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func loadNews(_ sectionNumber: Int) {
-        selectedNewsSection = sectionNumber
-        
-        let feedParser = FeedParser()
-        if sectionNumber == 1 {
-            return
-        }
-        let url = sectionManager.getURL(sectionNumber: sectionNumber, sectionType: 0)
-        feedParser.parseFeed(url: url) { (newsItem) in
-            self.newsItem = newsItem
-            OperationQueue.main.addOperation {
-                self.tableView.reloadData()
-            }
-        }
+//        selectedNewsSection = sectionNumber
+//        
+//        let feedParser = FeedParser()
+//        if sectionNumber == 1 {
+//            return
+//        }
+//        let url = sectionManager.getURL(sectionNumber: sectionNumber, sectionType: 0)
+//        feedParser.parseFeed(url: url) { (newsItem) in
+//            self.newsItem = newsItem
+//            OperationQueue.main.addOperation {
+//                self.tableView.reloadData()
+//            }
+//        }
     }
     
     func setNavigation() {
