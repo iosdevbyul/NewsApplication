@@ -11,6 +11,7 @@ import UIKit
 class SettingViewController: UIViewController {
     
     let settingRegionButton = UIButton()
+    var changeRegionView = UIView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +21,27 @@ class SettingViewController: UIViewController {
         self.view.backgroundColor = .lightGray
         
         setSettingView()
+        
+        setNotificationForSelectRegionView()
+        
+        setChangeRegionView()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.changeRegionView.isHidden = true
+    }
+    
+    func setNotificationForSelectRegionView() {
+        NotificationCenter.default.addObserver(self, selector: #selector(didselectRegion(_:)), name: .didSelectRegion, object: nil)
+    }
+    
+    @objc func didselectRegion(_ notification: Notification) {
+        let alertController = UIAlertController(title: "Saved", message: "Selected region is saved", preferredStyle: .alert)
+        let alertAction = UIAlertAction(title: "OK", style: .default) { (action) in
+            self.changeRegionView.isHidden = true
+        }
+        alertController.addAction(alertAction)
+        self.present(alertController, animated: true, completion: nil)
     }
     
     func setSettingView() {
@@ -39,11 +61,15 @@ class SettingViewController: UIViewController {
         settingRegionButton.backgroundColor = .red
     }
     
-    @objc func changeRegion() {
-        print("Push Change Button")
-        let changeRegionView: SelectRegionView = SelectRegionView(frame: CGRect(x: 20, y: settingRegionButton.frame.origin.y, width: self.view.frame.size.width - 40, height: self.view.frame.size.height - settingRegionButton.frame.origin.y - 30))
+    func setChangeRegionView() {
+        changeRegionView = SelectRegionView(frame: CGRect(x: 20, y: settingRegionButton.frame.origin.y, width: self.view.frame.size.width - 40, height: self.view.frame.size.height - settingRegionButton.frame.origin.y - 30))
         changeRegionView.backgroundColor = .white
         self.view.addSubview(changeRegionView)
+        self.changeRegionView.isHidden = true
+    }
+    
+    @objc func changeRegion() {
+        self.changeRegionView.isHidden = false
     }
     
     private func getNavigationHeight() -> CGFloat {
@@ -54,16 +80,8 @@ class SettingViewController: UIViewController {
         
         return height
     }
-    
+}
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
+extension Notification.Name {
+    static let didSelectRegion = Notification.Name("didSelectRegion")
 }

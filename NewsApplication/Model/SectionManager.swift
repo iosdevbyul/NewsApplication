@@ -60,10 +60,12 @@ class SectionManager {
         return region
     }
     
-    func getURL(sectionNumber: Int, sectionType: Int) -> String {
+    func getURL(sectionType: Int, sectionNumber: Int) -> String {
         //Section Type
         // 0 : News Section
         // 1 : Region Section
+        
+        //sectionNumber is only for News Section (0)
         
         var url: String = ""
         
@@ -140,6 +142,7 @@ class SectionManager {
                 return url
             }
         }
+        print("URL : \(url)")
         return url
     }
     

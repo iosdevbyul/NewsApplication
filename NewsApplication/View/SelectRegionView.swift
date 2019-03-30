@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import SwiftyPlistManager
+
 
 class SelectRegionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
     
@@ -30,12 +32,18 @@ class SelectRegionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     func settingPicker() {
+        print(self.frame.size.width)
+        print(self.frame.size.height)
         self.picker.frame = CGRect(x: 20, y: 20, width: self.frame.size.width - 40, height: self.frame.size.height - 80)
+        print(self.picker.frame)
         self.addSubview(self.picker)
+        
         self.picker.delegate = self
         self.picker.dataSource = self
         
         self.picker.selectedRow(inComponent: 0)
+        
+        print(self.picker.frame)
     }
     
     func settingButton() {
@@ -47,7 +55,16 @@ class SelectRegionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
     }
     
     @objc func clickSelectRegion() {
-        print("selected")
+        let result: Int = self.picker.selectedRow(inComponent: 0)
+        print("Selected row of the picker : \(result)")
+        SwiftyPlistManager.shared.save(result, forKey: "Region", toPlistWithName: "News") { (error) in
+            if error == nil {
+                print("Saved")
+                NotificationCenter.default.post(name: .didSelectRegion, object: nil, userInfo: nil)
+            } else {
+                print("Fail to save the data")
+            }
+        }
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {

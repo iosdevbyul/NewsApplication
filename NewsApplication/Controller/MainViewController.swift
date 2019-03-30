@@ -22,13 +22,15 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     let sectionHeight: CGFloat = 50
     
     let sectionManager = SectionManager()
-    var selectedNewsSection: Int = 0
+
+    var selectedSectionType: Int = 0
+    var selectedSectionNumber: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         self.view.backgroundColor = .lightGray
-        checkRegion()
+        
         setNavigation()
         setSectionView()
         setTableView()
@@ -36,42 +38,69 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         NotificationCenter.default.addObserver(self, selector: #selector(didClickSectionToReloadTableView(_:)), name: .didClickSection, object: nil)
     }
     
-    func checkRegion() {
+    func checkRegion() -> Int {
+        var returnResult: Int = 0
+        
         SwiftyPlistManager.shared.start(plistNames: ["News"], logging: true)
         SwiftyPlistManager.shared.getValue(for: "Region", fromPlistWithName: "News") { (result, error) in
             if error == nil {
                 guard let result = result else {
                     return
                 }
-                print("\(result)")
+                returnResult = result as! Int
             }
         }
-
+        return returnResult
     }
     
     @objc func didClickSectionToReloadTableView(_ notification: Notification) {
         if let value = notification.userInfo?["selectedRegionSection"] {
-            loadNews(value as! Int)
+            selectedSectionType = 0
+            if value as! Int == 1 {
+                selectedSectionType = 1
+                loadNews(sectionType: selectedSectionType, sectionNumber: checkRegion())
+            } else {
+                selectedSectionType = 0
+                loadNews(sectionType: selectedSectionType, sectionNumber: value as! Int)
+            }
         }
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        loadNews(selectedNewsSection)
+        loadNews(sectionType: selectedSectionType, sectionNumber: selectedSectionNumber)
     }
     
-    private func loadNews(_ sectionNumber: Int) {
-        selectedNewsSection = sectionNumber
+    private func loadNews(sectionType: Int, sectionNumber: Int) {
+        selectedSectionType = sectionType
+        selectedSectionNumber = sectionNumber
         
         let feedParser = FeedParser()
+        
+        var url: String?
+        
         if sectionNumber == 1 {
+            
+            let result = checkRegion()
+            
+            url = sectionManager.getURL(sectionType: selectedSectionType, sectionNumber: result)
+        }else {
+            url = sectionManager.getURL(sectionType: selectedSectionType, sectionNumber: sectionNumber)
+        }
+        
+        guard let requestedUrl = url else {
             return
         }
-        let url = sectionManager.getURL(sectionNumber: sectionNumber, sectionType: 0)
-        feedParser.parseFeed(url: url) { (newsItem) in
+        
+        if(requestedUrl == "") {
+            print("Fail to get requested URL")
+            
+        } else {
+        feedParser.parseFeed(url: requestedUrl) { (newsItem) in
             self.newsItem = newsItem
             OperationQueue.main.addOperation {
                 self.tableView.reloadData()
             }
+        }
         }
     }
     
@@ -135,7 +164,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     @objc func refreshTableView(_ sender: Any) {
-        self.loadNews(self.selectedNewsSection)
+        self.loadNews(sectionType: selectedSectionType, sectionNumber: selectedSectionNumber)
         self.refreshControl.endRefreshing()
         self.activityIndicatorView.stopAnimating()
         
@@ -184,5 +213,4 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
 
 extension Notification.Name {
     static let didClickSection = Notification.Name("didClickSection")
-
 }
