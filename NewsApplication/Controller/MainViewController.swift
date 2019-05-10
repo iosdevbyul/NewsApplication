@@ -8,8 +8,10 @@
 
 import UIKit
 import SwiftyPlistManager
+import NVActivityIndicatorView
 
-class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
+class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, NVActivityIndicatorViewable {
 
     private var newsItem: [News]?
     
@@ -25,6 +27,8 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     var selectedSectionType: Int = 0
     var selectedSectionNumber: Int = 0
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,6 +75,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     private func loadNews(sectionType: Int, sectionNumber: Int) {
+        
+        var result: Bool = false
+        
+        startAnimating(CGSize(width: 100, height: 100), message: "Loading", messageFont: UIFont(name: "HelveticaNeue-UltraLight", size: 20), type: NVActivityIndicatorType.ballClipRotateMultiple, color: UIColor.red, padding: 100, displayTimeThreshold: 10, minimumDisplayTime: 2, backgroundColor: UIColor.white, textColor: UIColor.red, fadeInAnimation: nil)
+        
         selectedSectionType = sectionType
         selectedSectionNumber = sectionNumber
         
@@ -95,17 +104,35 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             print("Fail to get requested URL")
             
         } else {
-        feedParser.parseFeed(url: requestedUrl) { (newsItem) in
+            result = true
+            feedParser.parseFeed(url: requestedUrl) { (newsItem) in
             self.newsItem = newsItem
             OperationQueue.main.addOperation {
+                
                 self.tableView.reloadData()
+                NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
             }
+        }}
+        
+        if result == false {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 10) {
+                NVActivityIndicatorPresenter.sharedInstance.stopAnimating(nil)
+                let alertController = UIAlertController(title: "Error", message: "Please try again", preferredStyle: .alert)
+                let alertAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                alertController.addAction(alertAction)
+                self.present(alertController, animated: true, completion: nil)
+            }
+            
         }
-        }
+        
+ 
     }
     
     func setNavigation() {
         self.title = "My Pic News"
+        
+        let refreshButton = UIBarButtonItem(image: UIImage(named: "reload"), style: .plain, target: self, action: #selector(refresh))
+        self.navigationItem.leftBarButtonItem = refreshButton
         
         let barButton = UIBarButtonItem(image: UIImage(named: "headView_setting"), style: .plain, target: self, action: #selector(gotoSetting))
         self.navigationItem.rightBarButtonItem = barButton
@@ -115,6 +142,10 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     @objc func gotoSetting() {
         let nextViewController = SettingViewController()
         self.navigationController?.pushViewController(nextViewController, animated: true)
+    }
+    
+    @objc func refresh() {
+        loadNews(sectionType: selectedSectionType, sectionNumber: selectedSectionNumber)
     }
     
     private func getNavigationHeight() -> CGFloat {
@@ -156,11 +187,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         self.refreshControl.addTarget(self, action: #selector(refreshTableView(_:)), for: .valueChanged)
         
         self.refreshControl.tintColor = .red
-        
-
-//        let myAttribute = [NSAttributedString.Key.foregroundColor: UIColor.red]
-//        let myAttrString = NSAttributedString(string: "Reloading News Data ...", attributes: myAttribute)
-//        self.refreshControl.attributedTitle = myAttrString
     }
     
     @objc func refreshTableView(_ sender: Any) {
@@ -203,10 +229,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        //
     }
 }
 

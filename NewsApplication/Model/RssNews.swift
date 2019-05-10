@@ -77,6 +77,7 @@ class FeedParser: NSObject, XMLParserDelegate {
     
     
     func parseFeed(url: String, completionHandler: (([News]) -> Void)?) {
+        
         self.parserCompletionHandler = completionHandler
         
         let request = URLRequest(url: URL(string: url)!)

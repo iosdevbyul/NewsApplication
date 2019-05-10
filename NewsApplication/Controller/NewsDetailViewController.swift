@@ -44,9 +44,5 @@ class NewsDetailViewController: UIViewController {
         let request: URLRequest = URLRequest(url: url)
         webView.load(request)
     }
-    
-    
-    
-    
 }
 

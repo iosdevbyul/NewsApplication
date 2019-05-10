@@ -18,7 +18,7 @@ class SettingViewController: UIViewController {
         self.view.backgroundColor = .white
         // Do any additional setup after loading the view.
         
-        self.view.backgroundColor = .lightGray
+//        self.view.backgroundColor = .lightGray
         
         setSettingView()
         
@@ -47,7 +47,6 @@ class SettingViewController: UIViewController {
     func setSettingView() {
         let titleLabel: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width - 20, height: 60))
         titleLabel.text = "Setting"
-        titleLabel.backgroundColor = .red
         titleLabel.textAlignment = .center
         titleLabel.center = self.view.center
         titleLabel.frame.origin.y = getNavigationHeight() + 10

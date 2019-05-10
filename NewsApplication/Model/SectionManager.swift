@@ -142,7 +142,6 @@ class SectionManager {
                 return url
             }
         }
-        print("URL : \(url)")
         return url
     }
     
